@@ -1,0 +1,68 @@
+{
+    "task": "Q3 - End-to-End Try-On Inference",
+    "model": "CatVTON",
+    "catvton_checkpoint": "zhengchong/CatVTON",
+    "base_model": "stable-diffusion-v1-5/stable-diffusion-inpainting",
+    "device": "Tesla T4",
+    "precision": "float16",
+    "resolution": {
+        "width": 384,
+        "height": 512
+    },
+    "batch_size": 1,
+    "diffusion_steps": 30,
+    "guidance_scale": 2.5,
+    "seed": 555,
+    "memory_workarounds": [
+        "FP16 inference",
+        "Batch size 1",
+        "384x512 inference resolution",
+        "30 diffusion steps",
+        "Sequential processing of pairs",
+        "CUDA cache cleared between pairs",
+        "Garbage collection between pairs"
+    ],
+    "q2_preprocessing": {
+        "parsing_maps": "/content/Smart-TryOn-System/Data/Output/Q2/parsing_maps",
+        "agnostic_images": "/content/Smart-TryOn-System/Data/Output/Q2/agnostic",
+        "garment_masks": "/content/Smart-TryOn-System/Data/Output/Q2/garment_masks",
+        "catvton_masks": "/content/Smart-TryOn-System/Data/Output/Q3/catvton_masks"
+    },
+    "results": [
+        {
+            "pair_id": "pair_01",
+            "status": "success",
+            "output": "/content/Smart-TryOn-System/Data/Output/Q3/tryon_results/pair_01_tryon.png",
+            "time_seconds": 7.52,
+            "peak_gpu_gb": 2.23
+        },
+        {
+            "pair_id": "pair_02",
+            "status": "success",
+            "output": "/content/Smart-TryOn-System/Data/Output/Q3/tryon_results/pair_02_tryon.png",
+            "time_seconds": 7.5,
+            "peak_gpu_gb": 2.23
+        },
+        {
+            "pair_id": "pair_03",
+            "status": "success",
+            "output": "/content/Smart-TryOn-System/Data/Output/Q3/tryon_results/pair_03_tryon.png",
+            "time_seconds": 7.86,
+            "peak_gpu_gb": 2.23
+        },
+        {
+            "pair_id": "pair_04",
+            "status": "success",
+            "output": "/content/Smart-TryOn-System/Data/Output/Q3/tryon_results/pair_04_tryon.png",
+            "time_seconds": 9.35,
+            "peak_gpu_gb": 2.23
+        },
+        {
+            "pair_id": "pair_05",
+            "status": "success",
+            "output": "/content/Smart-TryOn-System/Data/Output/Q3/tryon_results/pair_05_tryon.png",
+            "time_seconds": 7.88,
+            "peak_gpu_gb": 2.23
+        }
+    ]
+}

@@ -1,0 +1,5 @@
+person_01.png garment_01.jpg
+person_02.png garment_02.jpg
+person_03.png garment_03.jpg
+person_04.png garment_04.jpg
+person_05.png garment_05.jpg
