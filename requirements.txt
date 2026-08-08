@@ -1,0 +1,28 @@
+# Core numerical / image processing
+numpy
+pandas
+Pillow
+opencv-python
+matplotlib
+scikit-image
+
+# Machine learning / deep learning
+torch
+torchvision
+transformers
+accelerate
+safetensors
+huggingface-hub
+
+# Q1 - Florence-2
+sentencepiece
+
+# Q2 - Human parsing / segmentation
+onnxruntime
+rembg
+
+# Q3 - CatVTON / diffusion inference
+diffusers
+ftfy
+tqdm
+einops
