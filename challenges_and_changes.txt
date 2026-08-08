@@ -1,0 +1,195 @@
+SMART TRY-ON SYSTEM – CHALLENGES FACED AND CHANGES MADE
+==============================================================
+
+This document records the main implementation challenges encountered during
+the XIPL Smart Try-On System development and the important changes made while
+connecting Q1, Q2, Q3 and the attempted Q4 pipeline.
+
+1. GOOGLE COLAB GPU / VRAM LIMITATIONS
+--------------------------------------
+
+The project was developed using the free Google Colab GPU environment.
+Running multiple computer-vision and diffusion models caused high GPU memory
+usage and occasional CUDA memory issues.
+
+Changes made:
+- Used FP16 where supported.
+- Used batch size 1.
+- Processed images sequentially.
+- Reduced CatVTON inference resolution to 384 x 512.
+- Reduced diffusion steps to 30.
+- Cleared CUDA cache using torch.cuda.empty_cache().
+- Used garbage collection after heavy inference.
+- Avoided keeping unnecessary large models in GPU memory simultaneously.
+
+These optimizations were especially important for Q3 because CatVTON is the
+most GPU-intensive stage.
+
+
+2. FLORENCE-2 COMPATIBILITY PROBLEMS
+-------------------------------------
+
+Florence-2 was selected for Q1 and was also intended to be reused as the
+VLM-as-judge model for Q4.
+
+During Q4 model loading, several compatibility errors occurred:
+
+- Florence2LanguageConfig missing forced_bos_token_id
+- RobertaTokenizer missing additional_special_tokens
+- Florence2ForConditionalGeneration missing _supports_sdpa
+
+Different loading/dependency configurations were tested. Because these
+compatibility problems could not be resolved reliably within the available
+Colab environment and time, Q4 was documented as incomplete rather than
+producing unreliable or fabricated scores.
+
+
+3. FLORENCE-2 STRUCTURED-OUTPUT LIMITATION IN Q1
+------------------------------------------------
+
+Florence-2 did not consistently return the requested structured key-value
+output when directly prompted for attributes. It often generated descriptive
+captions instead.
+
+Changes made:
+- Used Florence-2's <DETAILED_CAPTION> task.
+- Passed generated captions through a lightweight rule-based extraction
+  process.
+- Extracted garment type, sleeve length, neckline, colors, pattern, pose,
+  and body visibility.
+- Used "Unknown" when an attribute could not be reliably determined.
+
+
+4. SCHP / HUMAN PARSING COMPATIBILITY
+--------------------------------------
+
+The SCHP implementation depends on older libraries and components that can
+conflict with the current Google Colab/PyTorch environment.
+
+This created installation and runtime compatibility difficulties during Q2.
+
+Change made:
+The parsing stage was isolated and its generated outputs were saved. The
+downstream Q2 and Q3 stages then used the saved preprocessing artifacts.
+
+
+5. Q2-TO-Q3 FILE AND PATH INTEGRATION ISSUES
+---------------------------------------------
+
+Several FileNotFoundError problems occurred because generated file names and
+the paths expected by later cells did not initially match.
+
+Examples included:
+- No agnostic image found for person_01.png
+- Missing CatVTON mask for person_01_mask.png
+
+Changes made:
+- Standardized file naming using Path(...).stem.
+- Updated mask and agnostic-image path construction.
+- Updated Q3 cells to use the actual locations of Q2 outputs.
+- Added file-existence checks before expensive inference.
+
+
+6. CATVTON MASK INTEGRATION
+----------------------------
+
+CatVTON requires a correctly prepared person image, garment image and mask.
+The Q2 preprocessing outputs therefore had to be correctly connected to Q3.
+
+Changes made:
+- Connected Q2 preprocessing outputs to Q3.
+- Created a dedicated CatVTON mask directory.
+- Organized the required masks.
+- Updated visualization and inference cells to reference the correct mask
+  directory and file names.
+
+
+7. OFFICIAL AND ADDITIONAL EVALUATION PAIRS
+--------------------------------------------
+
+The assessment requires the official pairs together with two additional
+person/garment pairs for pair_04 and pair_05.
+
+Changes made:
+- Added the required additional person/garment pairs.
+- Updated the pair configuration/manifest so the additional pairs could be
+  processed consistently.
+- Kept pair IDs consistent across the manifest and generated outputs.
+- Updated the evaluation-pair data used by the Q4 stage.
+- Ensured the same pair information could be used by Q2, Q3 and Q4.
+- Updated output naming so each pair could be traced from input to try-on
+  result and evaluation.
+
+
+8. Q3 OUTPUT ORGANIZATION
+--------------------------
+
+The Q3 stage generates intermediate and final files, so the output structure
+was organized as:
+
+Data/Output/Q3/
+    tryon_results/
+    inputs/
+    catvton_masks/
+    visualizations/
+    q3_constraints_log.json
+
+This makes the five try-on results and their supporting files easier to
+verify and connect to Q4.
+
+
+9. Q4 EVALUATION PREPARATION
+----------------------------
+
+Q4 requires three evaluation axes:
+
+- Garment fidelity
+- Identity preservation
+- VLM-as-judge
+
+The evaluation pipeline was prepared using lightweight approaches suitable
+for the free Colab environment.
+
+Changes made:
+- Created the Q4 evaluation dataframe from the pair information.
+- Connected every evaluation pair to its Q3 try-on output.
+- Added garment-fidelity evaluation logic.
+- Added face-region identity evaluation logic.
+- Added VLM comparison-image generation.
+- Added the written VLM judging rubric.
+- Added result/log generation and CSV generation logic.
+
+However, the Florence-2 compatibility issues prevented the complete Q4
+pipeline from being finalized reliably.
+
+
+10. MEMORY CLEANUP BETWEEN PIPELINE STAGES
+-------------------------------------------
+
+Because different stages use different deep-learning components, keeping all
+models in GPU memory could exceed the available Colab resources.
+
+Changes made:
+- Released unnecessary objects where possible.
+- Used Python garbage collection.
+- Cleared CUDA cache.
+- Processed expensive operations sequentially.
+- Reused cached model weights where possible.
+
+
+11. APPROACH TO FAILURES
+-------------------------
+
+The project was developed with reproducibility and free-tier hardware
+constraints as important considerations.
+
+Where an issue could be solved, the pipeline was modified and tested.
+Where a model/dependency compatibility issue could not be resolved
+reliably, it was documented instead of producing fabricated results.
+
+Completed/working work includes the Q1 image-understanding pipeline, the Q2
+human parsing/agnostic/garment segmentation pipeline, and the Q3 end-to-end
+CatVTON try-on pipeline with the configured five pairs.
+
+Q4 was developed up to the evaluation stage but remains incomplete because
+of the Florence-2 compatibility issues described above.
