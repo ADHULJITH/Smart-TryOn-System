@@ -138,32 +138,7 @@ This makes the five try-on results and their supporting files easier to
 verify and connect to Q4.
 
 
-9. Q4 EVALUATION PREPARATION
-----------------------------
-
-Q4 requires three evaluation axes:
-
-- Garment fidelity
-- Identity preservation
-- VLM-as-judge
-
-The evaluation pipeline was prepared using lightweight approaches suitable
-for the free Colab environment.
-
-Changes made:
-- Created the Q4 evaluation dataframe from the pair information.
-- Connected every evaluation pair to its Q3 try-on output.
-- Added garment-fidelity evaluation logic.
-- Added face-region identity evaluation logic.
-- Added VLM comparison-image generation.
-- Added the written VLM judging rubric.
-- Added result/log generation and CSV generation logic.
-
-However, the Florence-2 compatibility issues prevented the complete Q4
-pipeline from being finalized reliably.
-
-
-10. MEMORY CLEANUP BETWEEN PIPELINE STAGES
+9. MEMORY CLEANUP BETWEEN PIPELINE STAGES
 -------------------------------------------
 
 Because different stages use different deep-learning components, keeping all
@@ -177,7 +152,7 @@ Changes made:
 - Reused cached model weights where possible.
 
 
-11. APPROACH TO FAILURES
+10. APPROACH TO FAILURES
 -------------------------
 
 The project was developed with reproducibility and free-tier hardware
